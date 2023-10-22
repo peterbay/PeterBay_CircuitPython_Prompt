@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from .serial_io import SerialIO
-from .select import Select
+from .single_select import SingleSelect
 from .value import Value
 
 
@@ -11,7 +11,7 @@ class Wizard(SerialIO):
     def __init__(self, serial: object) -> None:
         super().__init__(serial)
         self._wizard_config = []
-        self._select = Select(serial)
+        self._single_select = SingleSelect(serial)
         self._value = Value(serial)
         self._default_values = {}
         self.reset()
@@ -51,11 +51,11 @@ class Wizard(SerialIO):
 
         self.write_line(question)
 
-        if type == "select":
-            self._active_component = self._select
-            self._select.set_options(data)
+        if type == "single_select":
+            self._active_component = self._single_select
+            self._single_select.set_options(data)
             if default:
-                self._select.set_active_option(default)
+                self._single_select.set_active_option(default)
 
         elif type == "value":
             rules = entry["rules"] if "rules" in entry else {}

@@ -8,7 +8,7 @@ wizard = wizard.Wizard(serial)
 wizard_questions = [
     {
         "name": "questio_1",
-        "type": "select",
+        "type": "single_select",
         "question": "Select one option:",
         "data": [
             {"label": "Option 1", "value": "option1"},
