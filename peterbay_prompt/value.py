@@ -12,6 +12,7 @@ class Value(Prompt):
 
     def __init__(self, serial: object) -> None:
         super().__init__(serial)
+        self.reset()
 
     def _check_allowed_types(self, allowed_types, value, stripped_value):
         if "bool" in allowed_types:
@@ -92,6 +93,12 @@ class Value(Prompt):
                     return False, value, error
 
         return True, value, None
+
+    def reset(self) -> None:
+        self._rules = {}
+        self._boolean_true = "yes"
+        self._boolean_false = "no"
+        self.set_buffer("")
 
     def set_rules(self, rules: dict) -> None:
         self._rules = rules
