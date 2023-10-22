@@ -1,6 +1,6 @@
 import usb_cdc
 
-from prompt.select import Select
+from peterbay_prompt.select import Select
 
 serial = usb_cdc.console
 

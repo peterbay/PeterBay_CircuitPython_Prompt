@@ -1,5 +1,5 @@
 import usb_cdc
-import prompt.wizard as wizard
+import peterbay_prompt.wizard as wizard
 
 serial = usb_cdc.console
 

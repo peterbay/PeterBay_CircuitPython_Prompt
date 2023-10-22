@@ -1,7 +1,7 @@
 import gc
 import usb_cdc
 
-from prompt.menu import Menu
+from peterbay_prompt.menu import Menu
 
 serial = usb_cdc.console
 

@@ -1,8 +1,8 @@
 import usb_cdc
-from prompt.terminal import Terminal
-from prompt.colors import Colors
-from prompt.cursor import Cursor
-from prompt.tokenizer import Tokenizer
+from peterbay_prompt.terminal import Terminal
+from peterbay_prompt.colors import Colors
+from peterbay_prompt.cursor import Cursor
+from peterbay_prompt.tokenizer import Tokenizer
 
 serial = usb_cdc.console
 
