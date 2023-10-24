@@ -1,11 +1,11 @@
 import usb_cdc
 
-from peterbay_prompt.single_select import SingleSelect
+from peterbay_prompt.multi_select import MultiSelect
 
 serial = usb_cdc.console
 
-select = SingleSelect(serial)
-select.set_label("Select one option:")
+select = MultiSelect(serial)
+select.set_label("Select one or more options:")
 select.set_options(
     [
         {"label": "Option 1", "value": "option1"},
@@ -14,7 +14,7 @@ select.set_options(
         {"label": "Option 4", "value": "option4"},
     ]
 )
-select.set_active_option("option3")
+select.set_active_options(["option3"])
 
 while True:
     try:
@@ -26,3 +26,4 @@ while True:
     except KeyboardInterrupt:
         select.keyboard_interrupt()
         continue
+

@@ -159,8 +159,8 @@ class Tokenizer:
             if "quote" in token:
                 content = token["quote"] + content + token["quote"]
 
-            type = token["type"]
-            name = token["name"] if "name" in token else ""
+            type = token.get("type", None)
+            name = token.get("name", "")
 
             if type in ["space", "text"]:
                 text += content

@@ -143,10 +143,10 @@ class Menu(SerialIO):
                 if not "hotkey" in child:
                     child["hotkey"] = str(child_index)
 
-                hotkey = child["hotkey"]
+                hotkey = child.get("hotkey", "")
                 value = self._get_value(child, " val: {0}")
                 has_childs = " >> " if "childs" in child else ""
-                label = child["label"] if "label" in child else ""
+                label = child.get("label", "")
 
                 self._print_menu_line(
                     f" {hotkey: >2}. {label: <20} {has_childs}{value}"

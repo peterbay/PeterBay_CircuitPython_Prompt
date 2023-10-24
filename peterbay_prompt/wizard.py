@@ -4,6 +4,7 @@
 
 from .serial_io import SerialIO
 from .single_select import SingleSelect
+from .multi_select import MultiSelect
 from .value import Value
 
 
@@ -12,6 +13,7 @@ class Wizard(SerialIO):
         super().__init__(serial)
         self._wizard_config = []
         self._single_select = SingleSelect(serial)
+        self._multi_select = MultiSelect(serial)
         self._value = Value(serial)
         self._default_values = {}
         self.reset()
@@ -33,23 +35,23 @@ class Wizard(SerialIO):
         if self._wizard_info:
             self.write_line(self._wizard_info)
 
-    def _init_wizard_question(self) -> None:
+    def _init_wizard_entry(self) -> None:
         if self._printed_index is None:
             self._printed_index = 0
 
         entry = self._wizard_config[self._printed_index]
 
-        question = entry["question"]
-        type = entry["type"]
-        name = entry["name"]
-        data = entry["data"] if "data" in entry else None
-        default = entry["default"] if "default" in entry else ""
-        settings = entry["settings"] if "settings" in entry else {}
+        label = entry.get("label", "")
+        type = entry.get("type", None)
+        name = entry.get("name", "")
+        data = entry.get("data", None)
+        default = entry.get("default", "")
+        settings = entry.get("settings", {})
 
         if name in self._default_values:
             default = self._default_values[name]
 
-        self.write_line(question)
+        self.write_line(label)
 
         if type == "single_select":
             self._active_component = self._single_select
@@ -57,8 +59,14 @@ class Wizard(SerialIO):
             if default:
                 self._single_select.set_active_option(default)
 
+        elif type == "multi_select":
+            self._active_component = self._multi_select
+            self._multi_select.set_options(data)
+            if default:
+                self._multi_select.set_active_options(default)
+
         elif type == "value":
-            rules = entry["rules"] if "rules" in entry else {}
+            rules = entry.get("rules", {})
             self._active_component = self._value
             self._value.set_rules(rules)
             self._value.set_value(default)
@@ -71,13 +79,13 @@ class Wizard(SerialIO):
         entry = self._wizard_config[self._printed_index]
         self._results[entry["name"]] = value
 
-    def _next_question(self) -> None:
+    def _next_entry(self) -> None:
         if len(self._wizard_config) <= self._printed_index + 1:
             return False
 
         self._printed_index += 1
         self._active_component = None
-        self._init_wizard_question()
+        self._init_wizard_entry()
         return True
 
     def keyboard_interrupt(self) -> None:
@@ -88,15 +96,15 @@ class Wizard(SerialIO):
     def read_non_blocking(self) -> None:
         if self._printed_index is None:
             self._print_wizard_info()
-            self._init_wizard_question()
+            self._init_wizard_entry()
 
         if self._active_component is not None:
             result = self._active_component.read_non_blocking()
             if result is not None:
                 self._set_value(result)
 
-                next_question = self._next_question()
-                if not next_question:
+                next_label = self._next_entry()
+                if not next_label:
                     return self._results
 
                 return None

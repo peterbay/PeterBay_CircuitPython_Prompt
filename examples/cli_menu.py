@@ -110,6 +110,3 @@ while True:
     except KeyboardInterrupt:
         menu.keyboard_interrupt()
         continue
-
-while True:
-    pass

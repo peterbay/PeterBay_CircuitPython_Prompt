@@ -5,11 +5,10 @@
 from .input import Input
 
 
-class SingleSelect(Input):
+class MultiSelect(Input):
     _rendered = False
     _options = []
-    _active_option = None
-    _active_option_index = None
+    _active_options = []
     _active_line = None
     _label = None
 
@@ -21,26 +20,19 @@ class SingleSelect(Input):
         self._options = options
         self._rendered = False
 
-    def set_active_option(self, option: str) -> None:
-        self._active_option = option
-        self._active_option_index = None
+    def set_active_options(self, option: [str, list]) -> None:
+        self._active_options = option
         self._active_line = None
         self._rendered = False
 
     def _write_option_line(self, index: int, entry: dict, render_label: bool) -> None:
         mark = " "
 
-        if self._active_option is None:
-            self._active_option = entry["value"]
+        if self._active_options is None:
+            self._active_options = entry["value"]
 
-        if entry["value"] == self._active_option:
+        if entry["value"] in self._active_options:
             mark = "x"
-
-            if self._active_line is None:
-                self._active_line = index
-
-            if self._active_option_index is None:
-                self._active_option_index = index
 
         if render_label:
             label = entry["label"]
@@ -59,6 +51,8 @@ class SingleSelect(Input):
     def _render(self) -> None:
         if self._label:
             self.write_line(self._label)
+
+        self._active_line = 0
 
         for index, option in enumerate(self._options):
             self._write_option_line(index, option, True)
@@ -89,21 +83,19 @@ class SingleSelect(Input):
             self._move_cursor(1)
 
         elif key == " " or key == "x":
-            cursor_diff = self._active_option_index - self._active_line
-            if cursor_diff == 0:
-                return None
+            entry_value = self._options[self._active_line]["value"]
+            if entry_value in self._active_options:
+                self._active_options.remove(entry_value)
+                self.write(f" \33[D")
 
-            self.write(f"\33[sx\33[D")
-            self._move_cursor(cursor_diff)
-            self.write(f" \33[D\33[u")
-
-            self._active_option = self._options[self._active_line]["value"]
-            self._active_option_index = self._active_line
+            else:
+                self._active_options.append(entry_value)
+                self.write(f"x\33[D")
 
         elif key == "CTRL_M":
             self._move_cursor(len_options - self._active_line - 1)
             self.write(f"\r\n")
-            return self._active_option
+            return self._active_options
 
         return None
 
